@@ -45,7 +45,7 @@
 
 <p>I also don't know how that would play with some compiler
   optimizations.  Chez seems to be able to efficiently inline a lot,
-  completely removing a lot of the work (ie (transduce (tmap …) …) is
+  completely removing a lot of the work (i.e. (transduce (tmap …) …) is
   almost as fast as (map …))</p> <h2 id="naming">Naming</h2>
 
 <p>Another question is whether transducers like tcat and tdedupe
@@ -145,7 +145,7 @@
   reducing function that behaves as follows:</p>
 
 <ul>
-  <li>(): calls reducer with no arguments (producing it's identity)</li>
+  <li>(): calls reducer with no arguments (producing its identity)</li>
   <li>(result-so-far): Maybe transform the result-so-far and call
     reducer with it.</li>
   <li>(result-so-far input) Maybe do something to
@@ -154,7 +154,7 @@
 
 <p>A simple example is as following: (transduce (tfilter odd?) + '(1 2
   3 4 5)).  This first returns a transducer filtering all odd elements,
-  then it runs + without arguments to retrieve it's identity.  It then
+  then it runs + without arguments to retrieve its identity.  It then
   starts the transduction by passing + to the transducer returned by
   (tfilter odd?) which returns a reducing function.  It works not
   unlike reduce from srfi-1, but also checks whether one of the
@@ -243,8 +243,8 @@
 
 <h3 id="rcons">rcons</h3>
 
-<p>a simple consing reducer.  Whin called without values, it returns
-  it's identity: '(), with one value (which will be a list) it
+<p>a simple consing reducer.  When called without values, it returns
+  its identity: '(), with one value (which will be a list) it
   reverses the list.  When called with two values it conses the second
   value to the first.</p>
 
@@ -312,7 +312,7 @@
 
 <p>Returns a transducer which uses any value as a key in
   <em>map</em>.  If a mapping is found, the value of that mapping is
-  returned, othervise it just returns the original value.</p>
+  returned, otherwise it just returns the original value.</p>
 
 <p>Must not keep any internal state.  Modifying the map after treplace
   has been instantiated is an error.</p>
@@ -436,11 +436,11 @@
 <h1 id="acknowledgements">Acknowledgements</h1>
 
 <p>First of all, this would not have been done without Rich Hickey who
-  introduced transducers into clojure.  His talks were important for me
+  introduced transducers into Clojure.  His talks were important for me
   to grasp the basics of transducers.  Then I would like to thank large
   parts of the Clojure community for also struggling with
   understanding transducers.  The amount of material produced
-  explaining them in general, and clojure's implementation
+  explaining them in general, and Clojure's implementation
   specifically, has been instrumental in letting me make this a
   clean-room implementation.</p>
 
