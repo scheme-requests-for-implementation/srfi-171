@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>SRFI 171: Transducers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/srfi.css" type="text/css" />
+    <link href="/favicon.png" rel="icon" sizes="192x192" type="image/png" />
+  </head>
+
+  <body>
+
+<h1 id="title">Title</h1>
+<p>Transducers</p>
+
+<h1 id="author">Author</h1>
+<p>Linus Björnstam <a href="mailto:bjornstam.linus@fastmail.se">bjornstam.linus@fastmail.se</a></p>
+
+<h1 id="status">Status</h1>
+<p>???</p>
+
+<h1 id="abstract">Abstract</h1>
+
+<p>A library implementing transducers &mdash; composable algorithmic
+  transformations.  Scheme has many different ways of expressing
+  transformations over different collection types, but they are all
+  unique to whatever base type they work on.  This srfi proposes a new
+  construct, the transducer, that is oblivious to the context of which
+  it is being used</p>
+
+<h1 id="issues">Issues</h1> <h2 id="state">State</h2>
+
+<p>We have the issue of state to handle.  Hidden state is ugly, but at
+  the same time passing state with the transduction means quite a lot
+  of extra housekeeping.  The simplest solution would be to pass the
+  current result wrapped with a list of states, i.e: (cons result
+  state) where each transducer that is keeping state is responsible
+  for moving it forward.  It would not matter in the context of
+  user-facing functions such as transduce, but would be somewhat of a
+  burden when used as a regular step in other transformations.</p>
+
+<p>That simple solution would mean removing tail-call elimination for
+  state-keeping transducers, but that might be a cost worth
+  having.  Any suggestions are welcome.</p>
+
+<p>I also don't know how that would play with some compiler
+  optimizations.  Chez seems to be able to efficiently inline a lot,
+  completely removing a lot of the work (ie (transduce (tmap …) …) is
+  almost as fast as (map …))</p> <h2 id="naming">Naming</h2>
+
+<p>Another question is whether transducers like tcat and tdedupe
+  should be different from procedures that return transducers (like
+  tmap).  As it is now, you have to run (tdedupe), which really isn't
+  necessary.</p> <h2 id="what-to-export">What to export</h2>
+
+<p>In the reference implementation, collection-transduce dispatches to
+  a reducing function.  They are used in parts of the reference
+  implementation (tflatten and tcat), and they aren't a must-have
+  since the usages in the reference implementation could be rewritten
+  to use transduce.  There might be cases where one just wants to use
+  the reducer you have, and if you want to use it with transduce you
+  would then need a &quot;null-transducer&quot; that does nothing.</p>
+
+<p>I want to export these procedures, but then the naming needs to
+  change.  Suddenly having list/vector/string/bytevector-reduce is
+  weird.  Should they be exported and what should they be called? They
+  behave like reduce from srfi-1, apart from checking for reduced
+  values, but it still doesn't feel right.</p>
+
+<h1 id="rationale">Rationale</h1>
+
+<p>Some of the most common operations used in the scheme language are
+  those transforming list: map, filter, take and so on.  They work
+  well, are well understood and are used daily by most scheme
+  programmers.  They are however not general because they only work on
+  lists, and they do not compose very well since combining N of them
+  builds (- N 1) intermediate lists.</p>
+
+<p>Transducers are oblivious to what kind of process they are used in,
+  and are composable without building intermediate collections.  This
+  means we can create a transducer that squares all even numbers:
+  (compose (tfilter odd?) (tmap (lambda (x) (* x x)))) and reuse it
+  with lists, vectors or in just about any context where data flows in
+  one direction.  We could use it as a processing step for asynchronous
+  channels, with an event framework as a pre-processing step or even
+  in lazy contexts where you pass lazy collection and a transducer to
+  a function and get a new lazy collection back.</p>
+
+<p>The traditional scheme approach of having collection-specific
+  procedures is not changed.  We instead specify a general form of
+  transformations that complement these procedures.  The benefits are
+  obvious: We get a clear, well understood way of describing common
+  transformations in a way that is faster than just chaining the
+  collection-specific counterparts.  Even for slower schemes where the
+  overhead of transducers is big, the effects on garbage collection
+  times are often dramatic, making transducers a very attractive.</p>
+
+<h2 id="dependencies">Dependencies</h2>
+
+<p>The reference implementation of transducers depends on the
+  following:</p>
+
+<ul>
+  <li>srfi-9, define-record-type</li>
+  <li>A hash-table implementation</li>
+  <li>Proper compose procedure (included if it is not available)</li>
+  <li>A vector-&gt;list that behaves like in srfi-43</li></ul>
+
+<h2 id="portability">Portability</h2>
+
+<p>The reference implementation is easily portable to any
+  r5rs/r6rs-compatible scheme.  The non-standard things are:</p>
+
+<ul>
+  <li>a vector-&gt;list that takes a start and end argument</li>
+  <li>hash tables with support for set, get and discovering if an key
+    exists.</li>
+  <li>case-lambda (preferably efficiently implemented).</li></ul>
+
+<h1 id="general-discussion">General discussion</h1>
+
+<p>Even though transducers are somewhat of a generalisation of map and
+  friends, this is not really true.  Since transducers don't know about
+  which context they are being used, some transducers must keep state
+  where their collection-specific counterparts do not.  This SRFI
+  requires some transducers to be stateless (as is stated in the
+  documentation of each transducer), but many are allowed to keep
+  state.</p>
+
+<p>The central part of transducers are 3-arity reducing functions.</p>
+
+<ul>
+  <li>(): Produce an identity</li>
+  <li>(result-so-far): completion.  If you have nothing to do, then
+    just return the result so far</li>
+  <li>(result-so-far input) do whatever you like to the input and
+  produce a new result-so-far</li></ul>
+
+<p>In the case of a summing + reducer the reducer would produce, in
+  arity order: 0, result-so-far, (+ result-so-far input).  This happens
+  to be exactly what the regular + does.</p>
+
+<p>A transducer is a one-arity function that takes a reducing function
+  (in the list below called simply &quot;reducer&quot;) and produces a
+  reducing function that behaves as follows:</p>
+
+<ul>
+  <li>(): calls reducer with no arguments (producing it's identity)</li>
+  <li>(result-so-far): Maybe transform the result-so-far and call
+    reducer with it.</li>
+  <li>(result-so-far input) Maybe do something to
+    input and maybe call the reducer with result-so-far and the
+    maybe-transformed input.</li></ul>
+
+<p>A simple example is as following: (transduce (tfilter odd?) + '(1 2
+  3 4 5)).  This first returns a transducer filtering all odd elements,
+  then it runs + without arguments to retrieve it's identity.  It then
+  starts the transduction by passing + to the transducer returned by
+  (tfilter odd?) which returns a reducing function.  It works not
+  unlike reduce from srfi-1, but also checks whether one of the
+  intermediate transducers returns a &quot;reduced&quot; value
+  (implemented as a srfi-9 record), which means the reduction finished
+  early.</p>
+
+<p>Because transducers compose and the final reduction is only
+  executed in the last step, composed transducers will not build any
+  intermediate result or collections.  Although the normal way of
+  thinking about application of composed functions is right to left,
+  due to how the transduction is built it is applied left to
+  right.  (compose (tfilter odd?) (tmap sqrt)) will create a transducer
+  that first filter out any odd values and computes the square root of
+  the rest.</p>
+
+<h2 id="naming-1">Naming</h2>
+
+<p>Transducers and procedures that return transducers all have names
+  starting with t.  Reducing functions that are supposed to be used at
+  the end of a transduction all start with r.  Some reducers are just
+  straight up reducers, whereas others (like rany and revery) are
+  procedures that returns reducers.</p>
+
+<h2 id="scope-considerations">Scope considerations</h2>
+
+<p>The procedures specified here are only for the collections defined
+  in r7rs-small.  They could easily be extended to support r7rs-large
+  red docket, but specifying that would require conforming
+  implementations to also support a substantial part of the red
+  docket.  I therefore leave transduce unspecified for many data
+  types.  It is however encouraged to add [datatype]- transduce for
+  whatever types your scheme supports.  Adding support for the
+  collections of the red docket (sets, hash-tables, ilists, rlists,
+  ideque, texts, lseqs, streams, generators and list-queues) is
+  trivial.</p>
+
+<p>The transduce form is always eager, and any general lazy
+  application of transducers is outside the scope of this SRFI.</p>
+
+<h1 id="specification">Specification</h1>
+
+<h2 id="applying-transducers">Applying transducers</h2>
+
+<h3 id="transduce">transduce</h3>
+
+<p><em>(list-transduce xform f lst)
+<br /> (list-transduce xform f
+  identity lst)</em></p>
+
+<p>Initializes the transducer xform by passing the reducer f to it.  If
+  no identity is provided, f is run without arguments to return the
+  reducer identity.  It then reduces over lst using the identity as the
+  seed.</p>
+
+<p>If one of the transducers finishes early (such as ttake or tdrop),
+  it communicates this by returning a reduced value, which in the
+  reference implementation is just a value wrapped in a srfi-9 record
+  type named &quot;reduced&quot;.  If such a value is returned by the
+  transducer, list-transduce must stop execution immediately.</p>
+
+<h3 id="vector-transduce">vector-transduce</h3>
+
+<p><em>(vector-transduce xform f vec)
+<br /> (vector-transduce xform f
+  identity vec)</em></p>
+
+<p>Same as transduce, but reduces over a vector instead of a list.</p>
+
+<h3 id="string-transduce">string-transduce</h3>
+
+<p><em>(string-transduce xform f str)
+<br /> (string-transduce xform f
+  identity str)</em></p>
+
+<p>Same as transduce, but for strings.</p>
+
+<h3 id="bytevector-transduce">bytevector-transduce</h3>
+
+<p><em>(bytevector-transduce xform f bvec)
+<br /> (bytevector-transduce xform f identity bvec)</em></p>
+
+<p>Same as transduce, but for bytevectors.</p>
+
+<h2 id="reducers">Reducers</h2>
+
+<h3 id="rcons">rcons</h3>
+
+<p>a simple consing reducer.  Whin called without values, it returns
+  it's identity: '(), with one value (which will be a list) it
+  reverses the list.  When called with two values it conses the second
+  value to the first.</p>
+
+<p>May use non-linear reverse! at the end.</p>
+
+<p>(transduce (tmap add1) rcons (list 0 1 2 3)) =&gt; (1 2 3 4)</p>
+
+<h3 id="reverse-rcons">reverse-rcons</h3>
+
+<p>same as rcons, but leaves the values in their reversed order.</p>
+
+<p>(transduce (tmap add1) reverse-rcons (list 0 1 2 3)) =&gt; (4 3 2
+  1)</p>
+
+<h3 id="rany-pred">(rany pred?)</h3>
+
+<p>The reducer version of any.  Returns (reduced (pred? value)) if any
+  (pred? value) returns truthy.  The identity is #f.</p>
+
+<p>(transduce (tmap (lambda (x) (+ x 1))) (rany odd?) (list 1 3 5))
+  =&gt; #f (transduce (tmap (lambda (x) (+ x 1))) (rany odd?) (list 1 3
+  4 5)) =&gt; #t</p>
+
+<h3 id="revery-pred">(revery pred?)</h3>
+
+<p>The reducer version of every.  Stops the transduction and returns
+  (reduced #f) if any (pred? value) returns #f.  If every (pred? value)
+  returns true, it returns the result of the last invocation of (pred?
+  value).</p>
+
+<p>(transduce (tmap add1) (revery (lambda (v) (if (odd? v) v #f)))
+  (list 2 4 6)) =&gt; 7 (transduce (tmap add1) (revery odd?) (list 2 4 5
+  6)) =&gt; #f</p>
+
+<h3 id="rcount">rcount</h3>
+
+<p>A simple counting reducer.  Counts the values that pass through the
+  transduction.</p>
+
+<p>(transduce (tfilter odd?) rcount (list 1 2 3 4)) =&gt; 2.</p>
+
+<h2 id="transducers">Transducers</h2>
+
+<h3 id="tmap-proc">(tmap proc)</h3>
+
+<p>Returns a transducer that applies proc to all values.  Must be
+  stateless.</p>
+
+<h3 id="tfilter-pred">(tfilter pred)</h3>
+
+<p>Returns a transducers that removes values for which pred returns
+  #f.  Must be stateless.</p>
+
+<h3 id="tremove-pred">(tremove pred)</h3>
+
+<p>Returns a transducer that removes values for which pred returns
+  truthy.  Must be stateless.</p>
+
+<h3 id="tfilter-map-proc">(tfilter-map proc)</h3>
+
+<p>The same as (compose (tmap proc) (tfilter values)).  Must be
+  stateless.</p>
+
+<h3 id="treplace-map">(treplace map)</h3>
+
+<p>Returns a transducer which uses any value as a key in
+  <em>map</em>.  If a mapping is found, the value of that mapping is
+  returned, othervise it just returns the original value.</p>
+
+<p>Must not keep any internal state.  Modifying the map after treplace
+  has been instantiated is an error.</p>
+
+<h3 id="tdrop-n">(tdrop n)</h3>
+
+<p>Returns a transducer that discards the first n values.</p>
+
+<p>Stateful.</p>
+
+<h3 id="ttake-n">(ttake n)</h3>
+
+<p>Returns a transducer that discards all values and stops the
+  transduction after the first n values have been let through.  Any
+  subsequent values are ignored.</p>
+
+<p>Stateful</p>
+
+<h3 id="tdrop-while-pred">(tdrop-while pred?)</h3>
+
+<p>Returns a transducer that discards the the first values for which
+  pred? returns true.</p>
+
+<p>Stateful</p>
+
+<h3 id="ttake-while-pred">(ttake-while pred?)</h3>
+
+<p>Returns a transducer that stops the transduction after pred? has
+  returned #f.  Any subsequent values are ignored and the last
+  successful value is returned.</p>
+
+<p>Stateful</p>
+
+<h3 id="thalt-when-pred-retf">(thalt-when pred?
+<em>[retf]</em>)</h3>
+
+<p>Returns a transducer that stops the transduction if pred? returns
+  true for a value.  retf must be a function of 2 arguments that is
+  passed the completed result so far and the value for which pred?
+  returned true.  If retf is not supplied it is the same thing as
+  (halt-when pred? (lambda (result-so-far value) value)).  When called
+  after it has stopped the transduction, it will always return the
+  same value.</p>
+
+<p>Is only useful together with transduce and will probably lead to
+  errors in other contexts.</p>
+
+<p>Stateful</p>
+
+<h3 id="tcat">tcat</h3>
+
+<p>Tcat <strong>is</strong> a transducer that concatenates the content
+  of each value (that must be a list) into the reduction.</p>
+
+<p>(transduce tcat rcons '((1 2) (3 4 5) (6 (7 8) 9))) =&gt; (1 2 3 4
+  5 6 (7 8) 9)</p>
+
+<h3 id="append-map-proc">(append-map proc)</h3>
+
+<p>The same as (compose (tmap proc) tcat).</p>
+
+<h3 id="tdedupe">(tdedupe)</h3>
+
+<p>Returns a transducer that removes consecutive duplicate
+  elements.</p>
+
+<p>Stateful.</p>
+
+<h3 id="tremove-duplicates">(tremove-duplicates)</h3>
+
+<p>Returns a transducer that removes any duplicate elements.</p>
+
+<p>Stateful.</p>
+
+<h3 id="tflatten">(tflatten)</h3>
+
+<p>Returns a transducer that flattens an input consisting of lists.</p>
+
+<p>(transduce (tflatten) rcons '((1 2) 3 (4 (5 6) 7 8) 9) =&gt; (1 2 3
+  4 5 6 7 8 9)</p>
+
+<h3 id="tpartition-all-n">(tpartition-all n)</h3>
+
+<p>Returns a transducer that groups n inputs in lists of n
+  elements.  When the transduction stops it flushes any remaining
+  collection, even if it contains less than n elements.</p>
+
+<p>Stateful.</p>
+
+<h3 id="tpartition-by-pred">(tpartition-by pred?)</h3>
+
+<p>Returns a transducer that groups inputs in lists by whenever (pred?
+  input) changes value.</p>
+
+<p>Stateful.</p>
+
+<h3 id="tindex-start">(tindex <em>[start]</em>)</h3>
+
+<p>Returns a transducer that indexes values passed through it,
+  starting at <em>start</em> which defaults to 0.  The indexing is done
+  through cons pairs like (index . input).</p>
+
+<p>Stateful</p>
+
+<h3 id="tlog-logger">(tlog <em>[logger]</em>)</h3>
+
+<p>Returns a transducer that can be used to log or print values and
+  results.  The result of the logger procedure is discarded.  The
+  default logger is (lambda (input result) (write input) (newline))</p>
+
+<h1 id="reference-implementation">Reference implementation</h1>
+
+<p>The reference implementation is written in Guile, but should be
+  straight-forward to port since it uses no guile-specific features
+  apart from guile's hash-table implementation.  In fact, I am quite
+  certain that It is written for clarity instead of speed, but should
+  be plenty fast anyway.  The low hanging fruit for optimization is to
+  replace the composed transducers (such as tappend-map and
+  tfilter-map) with actual implementations.</p>
+
+<h1 id="acknowledgements">Acknowledgements</h1>
+
+<p>First of all, this would not have been done without Rich Hickey who
+  introduced transducers into clojure.  His talks were important for me
+  to grasp the basics of transducers.  Then I would like to thank large
+  parts of the Clojure community for also struggling with
+  understanding transducers.  The amount of material produced
+  explaining them in general, and clojure's implementation
+  specifically, has been instrumental in letting me make this a
+  clean-room implementation.</p>
+
+<p>Lastly I would like to thank Arthur Gleckler who showed interest in
+  my implementation of transducers and convinced me to make this SRFI.</p>
+
+<h1 id="copyright">Copyright</h1>
+
+<p>Copyright (C) Linus Björnstam (2019).</p>
+
+<p>Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the “Software”), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.</p>
+
+<hr> <address>Editor: <a href="mailto:srfi-editors+at+srfi+dot+schemers+dot+org">Arthur A. Gleckler</a></address></body></html>
