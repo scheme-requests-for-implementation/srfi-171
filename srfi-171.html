@@ -64,7 +64,7 @@
 <p>I want to export these procedures, but then the naming needs to
   change.  Suddenly having list/vector/string/bytevector-reduce is
   weird.  Should they be exported and what should they be called? They
-  behave like reduce from srfi-1, apart from checking for reduced
+  behave like reduce from SRFI 1, apart from checking for reduced
   values, but it still doesn't feel right.</p>
 
 <h1 id="rationale">Rationale</h1>
@@ -100,10 +100,10 @@
 <p>The sample implementation of transducers depends on the following:</p>
 
 <ul>
-  <li>srfi-9, define-record-type</li>
+  <li>SRFI 9, define-record-type</li>
   <li>A hash-table implementation</li>
   <li>Proper compose procedure (included if it is not available)</li>
-  <li>A vector-&gt;list that behaves like in srfi-43</li></ul>
+  <li>A vector-&gt;list that behaves like in SRFI 43</li></ul>
 
 <h2 id="portability">Portability</h2>
 
@@ -156,9 +156,9 @@ r5rs/r6rs-compatible scheme.  The non-standard things are:</p>
   then it runs + without arguments to retrieve its identity.  It then
   starts the transduction by passing + to the transducer returned by
   (tfilter odd?) which returns a reducing function.  It works not
-  unlike reduce from srfi-1, but also checks whether one of the
+  unlike reduce from SRFI 1, but also checks whether one of the
   intermediate transducers returns a &quot;reduced&quot; value
-  (implemented as a srfi-9 record), which means the reduction finished
+  (implemented as a SRFI 9 record), which means the reduction finished
   early.</p>
 
 <p>Because transducers compose and the final reduction is only
@@ -211,7 +211,7 @@ r5rs/r6rs-compatible scheme.  The non-standard things are:</p>
 
 <p>If one of the transducers finishes early (such as ttake or tdrop),
   it communicates this by returning a reduced value, which in the
-  sample implementation is just a value wrapped in a srfi-9 record
+  sample implementation is just a value wrapped in a SRFI 9 record
   type named &quot;reduced&quot;.  If such a value is returned by the
   transducer, list-transduce must stop execution immediately.</p>
 
