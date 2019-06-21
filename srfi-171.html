@@ -53,13 +53,13 @@
   tmap).  As it is now, you have to run (tdedupe), which really isn't
   necessary.</p> <h2 id="what-to-export">What to export</h2>
 
-<p>In the reference implementation, collection-transduce dispatches to
-  a reducing function.  They are used in parts of the reference
+<p>In the sample implementation, collection-transduce dispatches to a
+  reducing function.  They are used in parts of the sample
   implementation (tflatten and tcat), and they aren't a must-have
-  since the usages in the reference implementation could be rewritten
-  to use transduce.  There might be cases where one just wants to use
-  the reducer you have, and if you want to use it with transduce you
-  would then need a &quot;null-transducer&quot; that does nothing.</p>
+  since the usages in the sample implementation could be rewritten to
+  use transduce.  There might be cases where one just wants to use the
+  reducer you have, and if you want to use it with transduce you would
+  then need a &quot;null-transducer&quot; that does nothing.</p>
 
 <p>I want to export these procedures, but then the naming needs to
   change.  Suddenly having list/vector/string/bytevector-reduce is
@@ -97,8 +97,7 @@
 
 <h2 id="dependencies">Dependencies</h2>
 
-<p>The reference implementation of transducers depends on the
-  following:</p>
+<p>The sample implementation of transducers depends on the following:</p>
 
 <ul>
   <li>srfi-9, define-record-type</li>
@@ -108,8 +107,8 @@
 
 <h2 id="portability">Portability</h2>
 
-<p>The reference implementation is easily portable to any
-  r5rs/r6rs-compatible scheme.  The non-standard things are:</p>
+<p>The sample implementation is easily portable to any
+r5rs/r6rs-compatible scheme.  The non-standard things are:</p>
 
 <ul>
   <li>a vector-&gt;list that takes a start and end argument</li>
@@ -212,7 +211,7 @@
 
 <p>If one of the transducers finishes early (such as ttake or tdrop),
   it communicates this by returning a reduced value, which in the
-  reference implementation is just a value wrapped in a srfi-9 record
+  sample implementation is just a value wrapped in a srfi-9 record
   type named &quot;reduced&quot;.  If such a value is returned by the
   transducer, list-transduce must stop execution immediately.</p>
 
@@ -423,9 +422,9 @@
   results.  The result of the logger procedure is discarded.  The
   default logger is (lambda (input result) (write input) (newline))</p>
 
-<h1 id="reference-implementation">Reference implementation</h1>
+<h1 id="sample-implementation">Sample implementation</h1>
 
-<p>The reference implementation is written in Guile, but should be
+<p>The sample implementation is written in Guile, but should be
   straight-forward to port since it uses no guile-specific features
   apart from guile's hash-table implementation.  In fact, I am quite
   certain that It is written for clarity instead of speed, but should
