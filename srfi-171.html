@@ -112,14 +112,14 @@ r5rs/r6rs-compatible scheme.  The non-standard things are:</p>
 
 <ul>
   <li>a vector-&gt;list that takes a start and end argument</li>
-  <li>hash tables with support for set, get and discovering if an key
-    exists.</li>
+  <li>hash tables with support for set, get and discovering whether a
+    key exists.</li>
   <li>case-lambda (preferably efficiently implemented).</li></ul>
 
 <h1 id="general-discussion">General discussion</h1>
 
 <p>Even though transducers are somewhat of a generalisation of map and
-  friends, this is not really true.  Since transducers don't know about
+  friends, this is not really true.  Since transducers don't know in
   which context they are being used, some transducers must keep state
   where their collection-specific counterparts do not.  This SRFI
   requires some transducers to be stateless (as is stated in the
@@ -425,7 +425,7 @@ r5rs/r6rs-compatible scheme.  The non-standard things are:</p>
 <h1 id="sample-implementation">Sample implementation</h1>
 
 <p>The sample implementation is written in Guile, but should be
-  straight-forward to port since it uses no guile-specific features
+  straightforward to port since it uses no guile-specific features
   apart from guile's hash-table implementation.  In fact, I am quite
   certain that It is written for clarity instead of speed, but should
   be plenty fast anyway.  The low hanging fruit for optimization is to
