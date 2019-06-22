@@ -1,0 +1,16 @@
+* SRFI 171: Transducers
+
+** by Linus Björnstam
+
+This repository hosts [[https://srfi.schemers.org/srfi-171/][SRFI 171]]: Transducers, a [[https://srfi.schemers.org/][Scheme Request for Implementation]].
+
+This SRFI is in /draft/ status.
+
+The full documentation for this SRFI can be found in the [[https://srfi.schemers.org/srfi-171/srfi-171.html][SRFI Document]].
+
+If you'd like to participate in the discussion of this SRFI, or report issues with it, please [[https://srfi.schemers.org/srfi-171/][join the SRFI-171 mailing list]] and send your message there.
+
+Thank you.
+
+
+[[mailto:srfi-editors@srfi.schemers.org][The SRFI Editors]]
