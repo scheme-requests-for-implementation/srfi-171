@@ -2,13 +2,21 @@
 ;; Copyright 2019 Linus Björnstam
 ;;
 ;; You may use this code under either the license in the SRFI document or the
-;; license below:
+;; license below.
 ;;
 ;; Permission to use, copy, modify, and/or distribute this software for any
 ;; purpose with or without fee is hereby granted, provided that the above
 ;; copyright notice and this permission notice appear in all source copies.
 ;; The software is provided "as is", without any express or implied warranties.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; A special value to be used as a placeholder where no value has been set and #f
+;; doesn't cut it. Not exported, and not really needed.
+(define-record-type <nothing>
+  (make-nothing)
+  nothing?)
+(define nothing (make-nothing))
 
 
 ;; helper function which ensures x is reduced.
@@ -19,7 +27,7 @@
 
 
 ;; helper function that wraps a reduced value twice since reducing functions (like list-reduce)
-;; unwraps them. tcat is a good example: it re-uses it's reducer on it's input using list-reduce.
+;; unwraps them. tconcatenate is a good example: it re-uses it's reducer on it's input using list-reduce.
 ;; If that reduction finishes early and returns a reduced value, list-reduce would "unreduce"
 ;; that value and try to continue the transducing process.
 (define (preserving-reduced f)
@@ -82,50 +90,10 @@
          (reduced #f)))))
 
 
-;; This is where the magic tofu is cooked
-(define (list-reduce f identity lst)
-  (if (null? lst)
-      identity
-      (let ((v (f identity (car lst))))
-        (if (reduced? v)
-            (deref-reduced v)
-            (list-reduce f v (cdr lst))))))
-
-(define (vector-reduce f identity vec)
-  (let ((len (vector-length vec)))
-    (let loop ((i 0) (acc identity))
-      (if (= i len)
-          acc
-          (let ((acc (f acc (vector-ref vec i))))
-            (if (reduced? acc)
-                (deref-reduced acc)
-                (loop (+ i 1) acc)))))))
-
-(define (string-reduce f identity str)
-  (let ((len (string-length str)))
-    (let loop ((i 0) (acc identity))
-      (if (= i len)
-          acc
-          (let ((acc (f acc (string-ref str i))))
-            (if (reduced? acc)
-                (deref-reduced acc)
-                (loop (+ i 1) acc)))))))
-
-(define (bytevector-u8-reduce f identity vec)
-  (let ((len (bytevector-length vec)))
-    (let loop ((i 0) (acc identity))
-      (if (= i len)
-          acc
-          (let ((acc (f acc (bytevector-u8-ref vec i))))
-            (if (reduced? acc)
-                (deref-reduced acc)
-                (loop (+ i 1) acc)))))))
-
-
-(define transduce
+(define list-transduce
   (case-lambda
     ((xform f coll)
-     (transduce xform f (f) coll))
+     (list-transduce xform f (f) coll))
     ((xform f init coll)
      (let* ((xf (xform f))
             (result (list-reduce xf init coll)))
@@ -158,6 +126,14 @@
             (result (bytevector-u8-reduce xf init coll)))
        (xf result)))))
 
+(define port-transduce
+  (case-lambda
+    ((xform f by port)
+     (port-transduce xform f (f) by port))
+    ((xform f init by port)
+     (let* ((xf (xform f))
+            (result (port-reduce xf init by port)))
+       (xf result)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Transducers!    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -258,44 +234,25 @@
                result)))))))
 
 
-(define (ttake-while pred)
-  (lambda (reducer)
-    (let ((take? #t))
-      (case-lambda
-        (() (reducer))
-        ((result) (reducer result))
-        ((result input)
-         (if (and take? (pred input))
-             (reducer result input)
-             (begin
-               (set! take? #f)
-               (ensure-reduced result))))))))
-
-
-(define thalt-when
+(define ttake-while
   (case-lambda
-    ((pred) (thalt-when pred (lambda (result input) input)))
+    ((pred) (ttake-while pred (lambda (result input) result)))
     ((pred retf)
      (lambda (reducer)
-       (let ((halt #f))
+       (let ((take? #t))
          (case-lambda
            (() (reducer))
-           ((result) (if halt
-                         (deref-reduced halt)
-                         (reducer result)))
+           ((result) (reducer result))
            ((result input)
-            (cond
-             ;; Halt is already guaranteed to be reduced if the halt condition has
-             ;; happened.
-             (halt halt)
-             ((pred input)
-              (set! halt (ensure-reduced (retf (reducer result) input)))
-              halt)
-             (else
-              (reducer result input))))))))))
+            (if (and take? (pred input))
+                (reducer result input)
+                (begin
+                  (set! take? #f)
+                  (ensure-reduced (retf result input)))))))))))
 
 
-(define (tcat reducer)
+
+(define (tconcatenate reducer)
   (let ((preserving-reducer (preserving-reduced reducer)))
     (case-lambda
       (() (reducer))
@@ -305,59 +262,65 @@
 
 
 (define (tappend-map f)
-  (compose (tmap f) tcat))
+  (compose (tmap f) tconcatenate))
+
+
+
+;; Flattens everything and passes each value through the reducer
+;; (list-transduce tflatten conj (list 1 2 (list 3 4 '(5 6) 7 8))) => (1 2 3 4 5 6 7 8)
+(define tflatten
+  (lambda (reducer)
+    (case-lambda
+      (() '())
+      ((result) (reducer result))
+      ((result input)
+       (if (list? input)
+           (list-reduce (preserving-reduced (tflatten reducer)) result input)
+           (reducer result input))))))
+
 
 
 ;; removes duplicate consecutive elements
-(define (tdedupe)
-  (lambda (reducer)
-    (let ((prev nothing))
-      (case-lambda
-        (() (reducer))
-        ((result) (reducer result))
-        ((result input)
-         (if (equal? prev input)
-             result
-             (begin
-               (set! prev input)
-               (reducer result input))))))))
+(define tdelete-neighbor-dupes
+  (case-lambda
+    (() (tdelete-neighbor-dupes equal?))
+    ((equality-pred?) 
+     (lambda (reducer)
+       (let ((prev nothing))
+         (case-lambda
+           (() (reducer))
+           ((result) (reducer result))
+           ((result input)
+            (if (equality-pred? prev input)
+                result
+                (begin
+                  (set! prev input)
+                  (reducer result input))))))))))
 
 
 ;; Deletes all duplicates that passes through.
-(define (tdelete-duplicates)
-  (lambda (reducer)
-    (let ([already-seen (make-hash-table 100)])
-      (case-lambda
-        [() (reducer)]
-        [(result) (reducer result)]
-        [(result input)
-         (if (hash-get-handle already-seen input)
-             result
-             (begin
-               (hash-set! already-seen input #t)
-               (reducer result input)))]))))
-
-
-
-;; Flattens everything and passes it through the reducers
-;; (transduce (tflatten) conj (list 1 2 (list 3 4 '(5 6) 7 8))) => (1 2 3 4 5 6 7 8)
-(define (tflatten)
-  (lambda (reducer)
-      (case-lambda
-        (() '())
-        ((result) (reducer result))
-        ((result input)
-         (if (list? input)
-             (list-reduce (preserving-reduced ((tflatten) reducer)) result input)
-             (reducer result input))))))
-
+(define tdelete-duplicates
+  (case-lambda
+    (() (tdelete-duplicates equal?))
+    ((equality-pred?)
+     (lambda (reducer)
+       (let ([already-seen (make-hash-table equality-pred?)])
+         (case-lambda
+           [() (reducer)]
+           [(result) (reducer result)]
+           [(result input)
+            (if (hash-table-exists? already-seen input)
+                result
+                (begin
+                  (hash-table-set! already-seen input #t)
+                  (reducer result input)))]))))))
 
 ;; Partitions the input into lists of N items. If the input stops it flushes whatever
 ;; it has collected, which may be shorter than n.
 ;; I am not sure about the correctness about this. It seems to work.
-(define (tpartition-all n)
+(define (tsegment n)
   (if (not (and (integer? n) (positive? n)))
-      (error "argument to tpartition-all must be a positive integer")
+      (error "argument to tsegment must be a positive integer")
       (lambda (reducer)
         (let ((i 0)
               (collect (make-vector n)))
@@ -386,7 +349,7 @@
 
 ;; I am not sure about the correctness of this. It seems to work.
 ;; we could maybe make it faster?
-(define (tpartition-by f)
+(define (tpartition f)
   (lambda (reducer)
     (let* ((prev nothing)
            (collect '()))
@@ -413,6 +376,7 @@
                (reducer result next-input))))))))))
 
 
+;; Interposes element between each value pushed through the transduction.
 (define (tinterpose elem)
   (lambda (reducer)
     (let ((send-elem? #f))
@@ -432,9 +396,9 @@
 
 
 ;; indexes every value passed through in a cons pair as in (index . value). By default starts at 0
-(define tindex
+(define tenumerate
   (case-lambda
-    (() (tindex 0))
+    (() (tenumerate 0))
     ((n)
      (lambda (reducer)
        (let ((n n))
