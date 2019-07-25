@@ -36,9 +36,9 @@
 
 <h1 id="rationale">Rationale</h1>
 
-<p>Some of the most common operations used in the scheme language are
+<p>Some of the most common operations used in the Scheme language are
   those transforming list: map, filter, take and so on.  They work
-  well, are well understood and are used daily by most scheme
+  well, are well understood and are used daily by most Scheme
   programmers.  They are however not general because they only work on
   lists, and they do not compose very well since combining <code>N</code>
   of them builds <code>(- N 1)</code> intermediate lists.</p>
@@ -54,12 +54,12 @@
   collection and a transducer to a function and get a new lazy
   collection back.</p>
 
-<p>The traditional scheme approach of having collection-specific
+<p>The traditional Scheme approach of having collection-specific
   procedures is not changed.  We instead specify a general form of
   transformations that complement these procedures.  The benefits are
   obvious: We get a clear, well understood way of describing common
   transformations in a way that is faster than just chaining the
-  collection-specific counterparts.  Even for slower schemes where the
+  collection-specific counterparts.  Even for slower Schemes where the
   overhead of transducers is big, the effects on garbage collection
   times are often dramatic, making transducers very attractive.</p>
 
@@ -77,7 +77,7 @@
 <h2 id="portability">Portability</h2>
 
 <p>The sample implementation is easily portable to any
-r5rs/r6rs/r7rs-compatible scheme.  The non-standard things are:</p>
+r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
 
 <ul>
   <li>a <code>vector-&gt;list</code> that takes a start and end
@@ -170,7 +170,7 @@ r5rs/r6rs/r7rs-compatible scheme.  The non-standard things are:</p>
   implementations to also support a substantial part of the red
   docket.  I therefore leave transduce unspecified for many data
   types.  It is however encouraged to add [datatype]-transduce for
-  whatever types your scheme supports.  Adding support for the
+  whatever types your Scheme supports.  Adding support for the
   collections of the r7rs red docket (sets, hash-tables, ilists, rlists,
   ideque, texts, lseqs, streams, generators and list-queues) is
   trivial.</p>
