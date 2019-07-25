@@ -245,7 +245,7 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
   <br />
   <code>(port-transduce</code> <em>xform f init reader port</em><code>)</code></p>
 
-<p> Applies <code>(xform f)</code> to every value produces by <code>(reader port)</code> until
+<p> Applies <code>(xform f)</code> to every value produced by <code>(reader port)</code> until
   <code>#eof-object</code> is returned.</p>
 
 <p><code>(port-transduce (tfilter odd?) rcons read (open-input-string "1 2 3 4"))</code>
@@ -401,7 +401,7 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
 <h3 id="tremove-duplicates"><code>(tdelete-duplicates <em>[equality-predicate]</em>)</code></h3>
 <p>Returns a transducer that removes any subsequent duplicate elements compared using
   <em>equality-predicate</em>. If the underlying data structure used for detecting duplicates
-  can't handle arbitrar equality predicates, it should at least support
+  can't handle arbitrary equality predicates, it should at least support
   <code>eq?</code>, <code>eqv?</code> and <code>equal?</code>. The default <em>equality-predicate</em>
   is <code>equal?</code>.</p>
 
@@ -508,8 +508,8 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
 <p> The sample implementation is written in Guile, but should be
    straightforward to port since it uses no guile-specific features
    apart from guile's hash-table implementation.  In fact, I am quite
-   certain that It is written for clarity instead of speed, but should
-   be plenty fast anyway.  The low hanging fruit for optimization is to
+   certain that it is written for clarity instead of speed, but should
+   be plenty fast anyway.  The low-hanging fruit for optimization is to
    replace the composed transducers (such as <code>tappend-map</code>
     and <code>tfilter-map</code>) with non-composed implementations.</p>
 
