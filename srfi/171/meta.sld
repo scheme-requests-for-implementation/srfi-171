@@ -10,22 +10,19 @@
 ;; The software is provided "as is", without any express or implied warranties.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(define-library (srfi 171 meta)
+  (import (scheme base) (srfi 9))
+  (export reduced reduced?
+          unreduce
+          ensure-reduced
+          preserving-reduced
 
-;; This module name is guile-specific. The correct name is of course
-;; (srfi 171 meta)
-(define-module (srfi srfi-171 meta)
-  #:use-module (srfi srfi-9)
-  #:use-module ((rnrs bytevectors) #:select (bytevector-length bytevector-u8-ref))
-  #:export (reduced reduced?
-            unreduce
-            ensure-reduced
-            preserving-reduced
+          list-reduce
+          vector-reduce
+          string-reduce
+          bytevector-u8-reduce
+          port-reduce)
 
-            list-reduce
-            vector-reduce
-            string-reduce
-            bytevector-u8-reduce
-            port-reduce))
+  (include "../srfi-171-meta.scm"))
 
-(include "../srfi-171-meta.scm")
 

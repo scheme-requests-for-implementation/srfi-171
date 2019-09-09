@@ -51,7 +51,7 @@
     ((lst x) (cons x lst))))
 
 
-(define reverse-rconj
+(define reverse-rcons
   (case-lambda
     (() '())
     ((lst) lst)
@@ -183,7 +183,7 @@
             x))))
    ((hash-table? map)
     (lambda (x)
-      (hash-ref map x x)))))
+      (hash-table-ref map x x)))))
 
 
 (define (treplace map)
@@ -304,16 +304,16 @@
     (() (tdelete-duplicates equal?))
     ((equality-pred?)
      (lambda (reducer)
-       (let ([already-seen (make-hash-table equality-pred?)])
+       (let ((already-seen (make-hash-table equality-pred?)))
          (case-lambda
-           [() (reducer)]
-           [(result) (reducer result)]
-           [(result input)
+           (() (reducer))
+           ((result) (reducer result))
+           ((result input)
             (if (hash-table-exists? already-seen input)
                 result
                 (begin
                   (hash-table-set! already-seen input #t)
-                  (reducer result input)))]))))))
+                  (reducer result input))))))))))
 
 ;; Partitions the input into lists of N items. If the input stops it flushes whatever
 ;; it has collected, which may be shorter than n.
