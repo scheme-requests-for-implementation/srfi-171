@@ -41,7 +41,7 @@
                   tsegment
                   tpartition
                   tinterpose
-                  tindex
+                  tenumerate
                   tlog))
 
 (include "171-impl.scm")

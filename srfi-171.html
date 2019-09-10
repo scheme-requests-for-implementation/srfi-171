@@ -380,14 +380,14 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
 
 
 <h3 id="tappend-map-proc"><code>(tappend-map</code> <em>proc</em><code>)</code></h3>
-<p>The same as <code>(compose (tmap proc) tcat)</code>.</p>
+<p>The same as <code>(compose (tmap proc) tconcatenate)</code>.</p>
 
 
 <h3 id="tflatten"><code>tflatten</code></h3>
 <p><code>tflatten</code> <strong>is</strong> a transducer that flattens an input
     consisting of lists.</p>
 
-<p><code>(list-transduce (tflatten) rcons '((1 2) 3 (4 (5 6) 7 8) 9)</code> =&gt;
+<p><code>(list-transduce tflatten rcons '((1 2) 3 (4 (5 6) 7 8) 9)</code> =&gt;
     <code>(1 2 3 4 5 6 7 8 9)</code></p>
 
 
