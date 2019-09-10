@@ -37,13 +37,11 @@
 
 (test-equal '((1 1 1 1) (2 2 2 2) (3 3 3) (4 4 4 4)) (list-transduce (tpartition even?) rcons '(1 1 1 1 2 2 2 2 3 3 3 4 4 4 4)))
 
-;; TODO??
-;(test-equal '((0 1) (2 3) (4)) (vector-transduce (tpartition-all 2) rcons numeric-vec))
+(test-equal '((0 1) (2 3) (4)) (vector-transduce (tsegment 2) rcons numeric-vec))
 
 (test-equal '(0 and 1 and 2 and 3 and 4) (list-transduce (tinterpose 'and) rcons numeric-list))
 
-;; TODO?
-;(test-equal '((-1 . 0) (0 . 1) (1 . 2) (2 . 3) (3 . 4)) (list-transduce (tindex (- 1)) rcons numeric-list))
+(test-equal '((-1 . 0) (0 . 1) (1 . 2) (2 . 3) (3 . 4)) (list-transduce (tenumerate (- 1)) rcons numeric-list))
 
 (test-end "transducers")
 

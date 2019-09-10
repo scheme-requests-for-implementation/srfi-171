@@ -50,6 +50,7 @@
           tsegment
           tpartition
           tinterpose
+          tenumerate
           tlog)
 
   ;; compose.scm uses fold-left, not available in
