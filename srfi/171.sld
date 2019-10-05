@@ -49,7 +49,7 @@
           tflatten
           tsegment
           tpartition
-          tinterpose
+          tadd-between
           tenumerate
           tlog)
 

@@ -12,6 +12,8 @@
 (test-equal '(1 2 3 4 5) (list-transduce (tmap add1) rcons numeric-list))
 (test-equal '(0 2 4) (list-transduce (tfilter even?) rcons numeric-list))
 (test-equal '(1 3 5) (list-transduce (compose (tfilter even?) (tmap add1)) rcons numeric-list))
+(test-equal '(1 3 5) (list-transduce (tfilter-map
+                                      (lambda (x) (if (even? x) (+ x 1) #f))) rcons numeric-list))
 
 (test-equal (string-transduce (tmap char->integer) rcons string) (list-transduce (tmap char->integer) rcons list-of-chars))
 (test-equal 6 (string-transduce (tfilter char-alphabetic?) rcount string))
@@ -39,7 +41,7 @@
 
 (test-equal '((0 1) (2 3) (4)) (vector-transduce (tsegment 2) rcons numeric-vec))
 
-(test-equal '(0 and 1 and 2 and 3 and 4) (list-transduce (tinterpose 'and) rcons numeric-list))
+(test-equal '(0 and 1 and 2 and 3 and 4) (list-transduce (tadd-between 'and) rcons numeric-list))
 
 (test-equal '((-1 . 0) (0 . 1) (1 . 2) (2 . 3) (3 . 4)) (list-transduce (tenumerate (- 1)) rcons numeric-list))
 
@@ -47,7 +49,14 @@
 
 
 
-(test-begin "reducers")
-;; TODO
-(test-equal #f (list-transduce (tfilter odd?) (rany even?) numeric-list))
-(test-end "reducers")
+(test-begin "x-transduce")
+(test-equal 15 (list-transduce (tmap add1) + numeric-list))
+(test-equal 15 (vector-transduce (tmap add1) + numeric-vec))
+;; This should really close it's port. I know.
+(test-equal 15 (port-transduce (tmap add1) + read (open-input-string "0 1 2 3 4")))
+
+;; Converts each numeric char to it's corresponding number (+ 1) and sums them.
+(test-equal 15 (string-transduce  (tmap (lambda (x) (- (char->integer x) 47))) + "01234"))
+
+
+(test-end "x-transduce")

@@ -23,7 +23,7 @@
                   rcount
                   rany
                   revery
-                  list-transduce vector-transduce string-transduce bytevector-u8-transduce port-transduce
+                  list-transduce vector-transduce string-transduce bytevector-u8transduce port-transduce
                   tmap
                   tfilter
                   tremove
@@ -40,7 +40,7 @@
                   tflatten
                   tsegment
                   tpartition
-                  tinterpose
+                  tadd-between
                   tenumerate
                   tlog))
 

@@ -110,8 +110,7 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
 
 <h2 id="concept-transducers">Concept: Transducers</h2>
 
-<p>A transducer is a one-arity function that takes a reducing function
-  (in the list below called simply &quot;reducer&quot;) and produces a
+<p>A transducer is a one-arity function that takes a reducer and produces a
   reducing function that behaves as follows:</p>
 
 <ul>
@@ -233,12 +232,12 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
 <p>Same as <code>transduce</code>, but for strings.</p>
 
 
-<h3 id="bytevector-transduce">bytevector-transduce</h3>
-<p><code>(bytevector-transduce</code> <em>xform f bvec</em><code>)</code>
+<h3 id="bytevector-u8-transduce">bytevector-u8-transduce</h3>
+<p><code>(bytevector-u8-transduce</code> <em>xform f bvec</em><code>)</code>
   <br />
-  <code>(bytevector-transduce</code> <em>xform f identity bvec</em><code>)</code></p>
+  <code>(bytevector-u8-transduce</code> <em>xform f identity bvec</em><code>)</code></p>
 
-<p>Same as transduce, but for bytevectors.</p>
+<p>Same as transduce, but for u8-bytevectors.</p>
 
 
 <h3 id="port-transduce">port-transduce</h3>
@@ -262,13 +261,13 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
   reverses the list.  When called with two values it conses the second
   value to the first.</p>
 
-<p><code>(list-transduce (tmap add1) rcons (list 0 1 2 3))</code> =&gt; (1 2 3 4)</p>
+<p><code>(list-transduce (tmap (lambda (x) (+ x 1)) rcons (list 0 1 2 3))</code> =&gt; (1 2 3 4)</p>
 
 <h3 id="reverse-rcons"><code>reverse-rcons</code></h3>
 
 <p>same as rcons, but leaves the values in their reversed order.</p>
 
-<p><code>(list-transduce (tmap add1) reverse-rcons (list 0 1 2 3))</code> =&gt; (4 3 2
+<p><code>(list-transduce (tmap (lambda (x) (+ x 1))) reverse-rcons (list 0 1 2 3))</code> =&gt; (4 3 2
   1)</p>
 
 <h3 id="rany-pred"><code>(rany</code> <em>pred?</em><code>)</code></h3>
@@ -292,12 +291,12 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
   value).</p>
 
 <p><pre>(list-transduce
-  (tmap add1)
+  (tmap (lambda (x) (+ x 1)))
   (revery (lambda (v) (if (odd? v) v #f)))
   (list 2 4 6))</pre> =&gt; <code>7</code>
   <br />
   <br />
-  <code>(list-transduce (tmap add1) (revery odd?) (list 2 4 5 6))</code> =&gt; <code>#f</code></p>
+  <code>(list-transduce (tmap (lambda (x) (+ x 1)) (revery odd?) (list 2 4 5 6))</code> =&gt; <code>#f</code></p>
 
 
 <h3 id="rcount"><code>rcount</code></h3>
@@ -423,8 +422,10 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
 
 <p>Stateful.</p>
 
-<h3 id="tinterpose-value"><code>(tinterpose </code> <em>value</em><code>)</code></h3>
-<p>Returns a transducer which interposes <em>value</em> between each value.</p>
+<h3 id="tadd-between-value"><code>(tadd-between </code> <em>value</em><code>)</code></h3>
+<p>Returns a transducer which interposes <em>value</em> between each value. This does not compose
+    gracefully with transducers like <code>ttake</code> as you might end up ending the
+    transduction on <em>value</em>.</p>
 
 <p>Stateful.</p>
 

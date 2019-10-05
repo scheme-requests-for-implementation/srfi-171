@@ -75,9 +75,10 @@
     (() #f)
     ((result) result)
     ((result input)
-     (if (pred input)
-         (reduced input)
-         #f))))
+     (let ((test (pred input)))
+       (if test
+           (reduced test)
+           #f)))))
 
 
 (define (revery pred)
@@ -85,9 +86,10 @@
     (() #t)
     ((result) result)
     ((result input)
-     (if (and result (pred input))
-         input
-         (reduced #f)))))
+     (let ((test (pred input)))
+       (if (and result test)
+           test
+           (reduced #f))))))
 
 
 (define list-transduce
@@ -377,7 +379,7 @@
 
 
 ;; Interposes element between each value pushed through the transduction.
-(define (tinterpose elem)
+(define (tadd-between elem)
   (lambda (reducer)
     (let ((send-elem? #f))
       (case-lambda
