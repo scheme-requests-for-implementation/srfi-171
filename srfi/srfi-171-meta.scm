@@ -83,3 +83,12 @@
           (if (reduced? acc)
               (unreduce acc)
               (loop (reader port) acc))))))
+
+(define (generator-reduce f identity gen)
+  (let loop ((val (gen)) (acc identity))
+    (if (eof-object? val)
+        acc
+        (let ((acc (f acc val)))
+          (if (reduced? acc)
+              (unreduce acc)
+              (loop (gen) acc))))))

@@ -4,7 +4,7 @@
 (import (scheme base)
         (scheme char)
         (scheme list)
-	(scheme read)
+        (scheme read)
         (srfi 171))
 (cond-expand
  (gauche (import (only (gauche base) compose)

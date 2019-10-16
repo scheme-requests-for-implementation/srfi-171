@@ -21,7 +21,8 @@
           vector-reduce
           string-reduce
           bytevector-u8-reduce
-          port-reduce)
+          port-reduce
+          generator-reduce)
 
   (include "../srfi-171-meta.scm"))
 

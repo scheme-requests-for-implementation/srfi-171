@@ -21,7 +21,7 @@
           (srfi 171 meta))
   (cond-expand
    (gauche (import (only (gauche base) compose reverse!)))
-   (chibi (import (only (srfi 1) reverse!))))
+   (chibi (import (only (srfi 1) fold reverse!))))
   (export rcons reverse-rcons
           rcount
           rany
@@ -32,6 +32,7 @@
           string-transduce
           bytevector-u8-transduce
           port-transduce
+          generator-transduce
 
           tmap
           tfilter
@@ -53,13 +54,15 @@
           tenumerate
           tlog)
 
-  ;; compose.scm uses fold-left, not available in
-  ;; Chibi. This is all we need for this SRFI
   (cond-expand
-   (chibi (begin (define compose
-                   (lambda (f g)
-                     (lambda args
-                       (f (apply g args)))))))
-   (else (begin)))
+    (chibi (begin
+             (define (compose . functions)
+               (define (make-chain thunk chain)
+                 (lambda args
+                   (call-with-values (lambda () (apply thunk args)) chain)))
+               (if (null? functions)
+                   values
+                   (fold make-chain (car functions) (cdr functions))))))
+    (else (begin)))
 
   (include "171-impl.scm"))

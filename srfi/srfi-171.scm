@@ -23,7 +23,13 @@
                   rcount
                   rany
                   revery
-                  list-transduce vector-transduce string-transduce bytevector-u8transduce port-transduce
+                  list-transduce
+                  vector-transduce
+                  string-transduce
+                  bytevector-u8transduce
+                  port-transduce
+                  generator-transduce
+                  
                   tmap
                   tfilter
                   tremove

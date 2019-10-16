@@ -39,6 +39,7 @@
 
 
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reducing functions meant to be used at the end at the transducing
 ;; process.    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -130,12 +131,24 @@
 
 (define port-transduce
   (case-lambda
+    ((xform f by)
+     (generator-transduce xform f by))
     ((xform f by port)
      (port-transduce xform f (f) by port))
     ((xform f init by port)
      (let* ((xf (xform f))
             (result (port-reduce xf init by port)))
        (xf result)))))
+
+(define generator-transduce
+  (case-lambda
+    ((xform f gen)
+     (generator-transduce xform f (f) gen))
+    ((xform f init gen)
+     (let* ((xf (xform f))
+            (result (generator-reduce xf init gen)))
+       (xf result)))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Transducers!    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -185,7 +198,10 @@
             x))))
    ((hash-table? map)
     (lambda (x)
-      (hash-table-ref map x x)))))
+      (hash-table-ref/default map x x)))
+   ((procedure? map) map)
+   (else
+    (error "Unsupported mapping in treplace" map))))
 
 
 (define (treplace map)
@@ -234,6 +250,7 @@
            (if (not (positive? new-n))
                (ensure-reduced result)
                result)))))))
+
 
 
 (define ttake-while
