@@ -152,7 +152,7 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
     where their collection-specific counterparts do not.  This SRFI
     requires some transducers to be stateless (as is stated in the
     documentation of each transducer), but many are allowed to keep
-    state. How state is kept in not specified. The reference
+    state. How state is kept in not specified. The sample
     implementation uses mutable values in closures which is efficient
     and portable, but has all the problems of hidden mutable state.</p>
 
@@ -544,7 +544,7 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
 <p> Another optimization would be to return whether or not a reducer
     can return a reduced value, thus allowing [collection]-reduce to
     avoid checking for reduced values, however this would break compatibility
-    with the reference implementation.</p>
+    with the sample implementation.</p>
 
 
 <h1 id="acknowledgements">Acknowledgements</h1>
