@@ -174,7 +174,7 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
   types.  It is however encouraged to add [datatype]-transduce for
   whatever types your Scheme supports.  Adding support for the
   collections of the r7rs red docket (sets, hash-tables, ilists, rlists,
-  ideque, texts, lseqs, streams, generators and list-queues) is
+  ideque, texts, lseqs, streams and list-queues) is
   trivial.</p>
 
 
@@ -205,16 +205,17 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
   <br />
   <code>(list-transduce</code> <em>xform f identity lst</em><code>)</code></p>
 
-<p>Initializes the transducer xform by passing the reducer f to it.  If
-  no identity is provided, f is run without arguments to return the
-  reducer identity.  It then reduces over lst using the identity as the
-  seed.</p>
+<p> Initializes the transducer xform by passing the reducer f to it.  If
+    no identity is provided, f is run without arguments to return the
+    reducer identity.  It then reduces over lst using the identity as the
+    seed.</p>
 
-<p>If one of the transducers finishes early (such as <code>ttake</code> or <code>tdrop</code>),
-  it communicates this by returning a reduced value, which in the
-  sample implementation is just a value wrapped in a SRFI 9 record
-  type named &quot;reduced&quot;.  If such a value is returned by the
-  transducer, list-transduce must stop execution immediately.</p>
+<p> If one of the transducers finishes early (such as <code>ttake</code> or <code>tdrop</code>),
+    it communicates this by returning a reduced value, which in the
+    sample implementation is just a value wrapped in a SRFI 9 record
+    type named &quot;reduced&quot;.  If such a value is returned by the
+    transducer, list-transduce must stop execution and return an unreduced value
+    immediately.</p>
 
 
 <h3 id="vector-transduce">vector-transduce</h3>
@@ -264,6 +265,7 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
     <code>(generator-transduce</code> <em>xform f init gen</em><code>)</code></p>
 
 <p> Same as list-transduce, but for srfi-158-styled generators</p>
+
 
 
 <h2 id="reducers">Reducers</h2>
@@ -497,8 +499,9 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
 
 <h3 id="list-reduce"><code>(list-reduce</code> <em>f identity lst</em><code>)</code></h3>
 <p> The reducing function used internally by <code>list-transduce</code>. <em>f</em> is reducer
-    as returned by a transducer. <em>identity</em> is the identity (sometimes called "seed") of
-    the reduction. <em>lst</em> is a list.</p>
+    as returned by a transducer. <em>i dentity</em> is the identity (sometimes called "seed") of
+    the reduction. <em>lst</em> is a list. If the <em>f</em> returns a reduced value, the reduction
+    stops immediately and the unreduced value is returned.</p>
 
 
 <h3 id="vector-reduce"><code>(vector-reduce</code> <em> f identity vec</em><code>)</code></h3>
@@ -532,15 +535,16 @@ r5rs/r6rs/r7rs-compatible Scheme.  The non-standard things are:</p>
 
 <p> The sample implementation is written in Guile, but should be
     straightforward to port since it uses no guile-specific features
-    apart from guile's hash-table implementation.  In fact, I am quite
-    certain that it is written for clarity instead of speed, but should
-    be plenty fast anyway.  The low-hanging fruit for optimization is to
-    replace the composed transducers (such as <code>tappend-map</code>
-    and <code>tfilter-map</code>) with non-composed implementations.</p>
+    apart from guile's hash-table implementation.  It is written for
+    clarity over speed, but should be plenty fast anyway.
+    The low-hanging fruit for optimization is to replace the composed
+    transducers (such as <code>tappend-map</code> and <code>tfilter-map</code>)
+    with non-composed implementations.</p>
 
 <p> Another optimization would be to return whether or not a reducer
     can return a reduced value, thus allowing [collection]-reduce to
-    avoid checking for reduced values.</p>
+    avoid checking for reduced values, however this would break compatibility
+    with the reference implementation.</p>
 
 
 <h1 id="acknowledgements">Acknowledgements</h1>
