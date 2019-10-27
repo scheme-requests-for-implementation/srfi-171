@@ -25,6 +25,7 @@
   <li>Draft #1 published: 2019/6/24</li>
   <li>Draft #2 published: 2019/7/25</li>
   <li>Draft #3 published: 2019/10/4</li>
+
 </ul>
 
 <h1 id="abstract">Abstract</h1>
@@ -39,12 +40,13 @@
 <h1 id="rationale">Rationale</h1>
 
 <p>Some of the most common operations used in the Scheme language are
-  those transforming lists: <code>map</code>, <code>filter</code>,
-  <code>take</code> and so on.  They work well, are well understood,
-  and are used daily by most Scheme programmers.  They are however not
-  general because they only work on lists, and they do not compose
-  very well since combining <code>N</code> of them builds <code>(- N
+    those transforming lists: <code>map</code>, <code>filter</code>,
+    <code>take</code> and so on.  They work well, are well understood,
+    and are used daily by most Scheme programmers.  They are however not
+    general because they only work on lists, and they do not compose
+    very well since combining <code>N</code> of them builds <code>(- N
   1)</code> intermediate lists.</p>
+
 
 <p>Transducers are oblivious to what kind of process they are used in,
   and are composable without building intermediate collections.  This
@@ -72,7 +74,7 @@
 
 <ul>
   <li>SRFI 9, <code>define-record-type</code> (included in R<sup>7</sup>RS
-    small)</li>
+      small)</li>
   <li>SRFI-69 (hash-tables)</li>
   <li>Proper compose procedure (included if it is not available)</li>
   <li>A <code>vector-&gt;list</code> that behaves like in SRFI 43
@@ -81,7 +83,7 @@
 <h2 id="portability">Portability</h2>
 
 <p>The sample implementation is easily portable to any
-r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
+    r<sup>5</sup>rs/r<sup>6</sup>rs/r<sup>7</sup>rs-compatible Scheme.  The non-standard things are:</p>
 
 <ul>
   <li>a <code>vector-&gt;list</code> that takes start and end
@@ -127,25 +129,26 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
     <em>result-so-far</em> and the maybe-transformed
     <em>input</em>.</li></ul>
 
-<p>A simple example is as following: <code>(list-transduce (tfilter
+
+<p> A simple example is as following: <code>(list-transduce (tfilter
   odd?) + '(1 2 3 4 5))</code>.  This first returns a transducer
-  filtering all odd elements, then it runs <code>+</code> without
-  arguments to retrieve its identity.  It then starts the transduction
-  by passing + to the transducer returned by <code>(tfilter
+    filtering all odd elements, then it runs <code>+</code> without
+    arguments to retrieve its identity.  It then starts the transduction
+    by passing + to the transducer returned by <code>(tfilter
   odd?)</code> which returns a reducing function.  It works not unlike
-  <code>reduce</code> from SRFI 1, but also checks whether one of the
-  intermediate transducers returns a &quot;reduced&quot; value
-  (implemented as a SRFI 9 record), which means the reduction finished
-  early.</p>
+    <code>reduce</code> from SRFI 1, but also checks whether one of the
+    intermediate transducers returns a &quot;reduced&quot; value
+    (implemented as a SRFI 9 record), which means the reduction finished
+    early.</p>
 
 <p>Because transducers compose and the final reduction is only
-  executed in the last step, composed transducers will not build any
-  intermediate result or collections.  Although the normal way of
-  thinking about application of composed functions is right to left,
-  due to how the transduction is built it is applied left to
-  right.  <code>(compose (tfilter odd?) (tmap sqrt))</code> will
-  create a transducer that first filters out any odd values and then
-  computes the square root of the rest.</p>
+    executed in the last step, composed transducers will not build any
+    intermediate result or collections.  Although the normal way of
+    thinking about application of composed functions is right to left,
+    due to how the transduction is built it is applied left to
+    right.  <code>(compose (tfilter odd?) (tmap sqrt))</code> will
+    create a transducer that first filters out any odd values and then
+    computes the square root of the rest.</p>
 
 <h2 id="state">State</h2>
 
@@ -160,6 +163,7 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
     closures, which is efficient and portable, but has all the problems
     of hidden mutable state.</p>
 
+
 <h2 id="naming">Naming</h2>
 
 <p>Transducers and procedures that return transducers all have names
@@ -171,15 +175,15 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 <h2 id="scope-considerations">Scope considerations</h2>
 
 <p>The procedures specified here are only for the collections defined
-  in R<sup>7</sup>RS small.  They could easily be extended to support
-  R<sup>7</sup>RS large red docket, but specifying that would require
-  conforming implementations to also support a substantial part of the
-  red docket.  I therefore leave transduce unspecified for many data
-  types.  It is however encouraged to add [datatype]-transduce for
-  whatever types your Scheme supports.  Adding support for the
-  collections of the R<sup>7</sup>RS red docket (sets, hash-tables,
-  ilists, rlists, ideque, texts, lseqs, streams and list-queues) is
-  trivial.</p>
+   in R<sup>7</sup>RS small.  They could easily be extended to support
+   R<sup>7</sup>RS large red docket, but specifying that would require
+   conforming implementations to also support a substantial part of the
+   red docket.  I therefore leave transduce unspecified for many data
+   types.  It is however encouraged to add [datatype]-transduce for
+   whatever types your Scheme supports.  Adding support for the
+   collections of the R<sup>7</sup>RS red docket (sets, hash-tables,
+   ilists, rlists, ideque, texts, lseqs, streams and list-queues) is
+   trivial.</p>
 
 
 <h2 id="lazy-eager">Eager or lazy semantics</h2>
@@ -204,6 +208,7 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 <h2 id="applying-transducers">Applying transducers</h2>
 
 <h3 id="list-transduce">list-transduce</h3>
+
 <p><code>(list-transduce</code> <em>xform f lst</em><code>)</code>
   <br />
   <code>(list-transduce</code> <em>xform f identity lst</em><code>)</code></p>
@@ -222,6 +227,7 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 
 
 <h3 id="vector-transduce">vector-transduce</h3>
+
 <p><code>(vector-transduce</code> <em>xform f vec</em><code>)</code>
   <br />
   <code>(vector-transduce</code> <em>xform f identity vec</em><code>)</code></p>
@@ -253,9 +259,9 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
    <code>(port-transduce</code> <em>xform f init reader port</em><code>)</code></p>
 
 <p> If <em>port</em> is provided, it applies <code>(xform f)</code> to every value
-    produced by <code>(reader port)</code> until <code>#eof-object</code> is returned.
+    produced by <code>(reader port)</code> until the EOF object is returned.
     If <em>port</em> is not provided, it calls <em>reader</em> without arguments until
-    <code>#eof-object</code> is returned.
+    the EOF object is returned.
 </p>
 
 <p><code>(port-transduce (tfilter odd?) rcons read (open-input-string "1 2 3 4"))</code>
@@ -269,27 +275,28 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 <p> Same as <code>list-transduce</code>, but for srfi-158-styled generators.</p>
 
 
-
 <h2 id="reducers">Reducers</h2>
 
 <h3 id="rcons"><code>rcons</code></h3>
 <p>a simple consing reducer.  When called without values, it returns
-  its identity, '().  With one value, which will be a list, it
-  reverses the list.  When called with two values, it conses the
-  second value to the first.</p>
+    its identity, '().  With one value, which will be a list, it
+    reverses the list.  When called with two values, it conses the
+    second value to the first.</p>
 
 <p><code>(list-transduce (tmap (lambda (x) (+ x 1)) rcons (list 0 1 2 3))</code> =&gt; <code>(1 2 3 4)</code></p>
 
+
 <h3 id="reverse-rcons"><code>reverse-rcons</code></h3>
-<p>same as <code>rcons</code>, but leaves the values in their reversed order.</p>
+<p>same as rcons, but leaves the values in their reversed order.</p>
 
 <p><code>(list-transduce (tmap (lambda (x) (+ x 1))) reverse-rcons (list 0 1 2 3))</code> =&gt; <code>(4 3 2
   1)</code></p>
 
 <h3 id="rany-pred"><code>(rany</code> <em>pred?</em><code>)</code></h3>
+
 <p>The reducer version of <code>any</code>.  Returns <code>(reduced
   (pred? value))</code> if any <code>(pred? value)</code> returns
-  non-<code>#f</code>.  The identity is <code>#f</code>.</p>
+    non-<code>#f</code>.  The identity is <code>#f</code>.</p>
 
 <p><code>(list-transduce (tmap (lambda (x) (+ x 1))) (rany odd?) (list 1 3 5))</code>
     =&gt; <code>#f</code>
@@ -299,13 +306,15 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
   <code>(list-transduce (tmap (lambda (x) (+ x 1))) (rany odd?) (list 1 3
   4 5))</code> =&gt; <code>#t</code></p>
 
+
 <h3 id="revery-pred"><code>(revery</code> <em>pred?</em><code>)</code></h3>
+
 <p>The reducer version of <code>every</code>.  Stops the transduction
-  and returns <code>(reduced #f)</code> if any <code>(pred?
+    and returns <code>(reduced #f)</code> if any <code>(pred?
   value)</code> returns <code>#f</code>.  If every <code>(pred?
   value)</code> returns true, it returns the result of the last
-  invocation of <code>(pred?  value)</code>. The identity is
-  <code>#t</code>.</p>
+    invocation of <code>(pred?  value)</code>. The identity is
+    <code>#t</code>.</p>
 
 <p><pre>(list-transduce
   (tmap (lambda (x) (+ x 1)))
@@ -337,19 +346,15 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 
 <h3 id="tremove-pred"><code>(tremove</code> <em>pred?</em><code>)</code></h3>
 <p>Returns a transducer that removes values for which <em>pred?</em> returns
-  non-<code>#f</code>. Must be stateless.</p>
+    non-<code>#f</code>. Must be stateless.</p>
 
 
 <h3 id="tfilter-map-proc"><code>(tfilter-map</code> <em>proc</em><code>)</code></h3>
 <p>The same as <code>(compose (tmap proc) (tfilter values))</code>.
-  Must be stateless.</p>
+    Must be stateless.</p>
 
 
 <h3 id="treplace-mapping"><code>(treplace</code> <em>mapping</em><code>)</code></h3>
-<p>Returns a transducer which checks for the presence of any value passed through it in
-    <em>mapping</em>.  If a mapping is found, the value of that mapping is
-    returned, otherwise it just returns the original value.</p>
-
 <p>The argument <em>mapping</em> is an association list (using equal?
     to compare keys), a hash-table, a one-argument procedure taking
     one argument and either producing that same argument or a
@@ -394,8 +399,8 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 
 <h3 id="tconcatenate"><code>tconcatenate</code></h3>
 <p><code>tconcatenate</code> <strong>is</strong> a transducer that
-  concatenates the content of each value (that must be a list) into
-  the reduction.</p>
+    concatenates the content of each value (that must be a list) into
+    the reduction.</p>
 
 <p><code>(list-transduce tconcatenate rcons '((1 2) (3 4 5) (6 (7 8) 9)))</code>
   =&gt;
@@ -415,7 +420,7 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 
 
 
-<h3 id="tdelete-neighbor-dupes"><code>(tdelete-neighbor-dupes <em>[equality-predicate]</em>)</code></h3>
+<h3 id="tdelete-neighbor-duplicates"><code>(tdelete-neighbor-duplicates <em>[equality-predicate]</em>)</code></h3>
 <p>Returns a transducer that removes any directly following duplicate
   elements. The default <em>equality-predicate</em> is <code>equal?</code>.</p>
 
@@ -434,9 +439,9 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 
 <h3 id="tsegment"><code>(tsegment</code> <em>n</em><code>)</code></h3>
 <p>Returns a transducer that groups <em>n</em> inputs in lists of
-  <em>n</em> elements.  When the transduction stops, it flushes any
-  remaining collection, even if it contains fewer than <em>n</em>
-  elements.</p>
+    <em>n</em> elements.  When the transduction stops, it flushes any
+    remaining collection, even if it contains fewer than <em>n</em>
+    elements.</p>
 
 <p>Stateful.</p>
 
@@ -449,19 +454,22 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 
 <h3 id="tadd-between-value"><code>(tadd-between </code> <em>value</em><code>)</code></h3>
 <p>Returns a transducer which interposes <em>value</em> between each
-  value and the next. This does not compose gracefully with
-  transducers like <code>ttake</code>, as you might end up ending the
-  transduction on <em>value</em>.</p>
+    value and the next. This does not compose gracefully with
+    transducers like <code>ttake</code>, as you might end up ending the
+    transduction on <em>value</em>.</p>
 
 <p>Stateful.</p>
 
 
 
 <h3 id="tenumerate-start"><code>(tenumerate</code> <em>[start]</em><code>)</code></h3>
-<p>Returns a transducer that indexes values passed through it,
-  starting at <em>start</em>, which defaults to 0.  The indexing is done
-  through <code>cons</code> pairs like <code>(</code><em>index</em>
-  <code>.</code> <em>input</em><code>)</code>.</p>
+<p> Returns a transducer that indexes values passed through it,
+    starting at <em>start</em>, which defaults to 0.  The indexing is done
+    through <code>cons</code> pairs like <code>(</code><em>index</em>
+    <code>.</code> <em>input</em><code>)</code>.</p>
+
+<p> <code>(list-transduce (tenumerate 1) rcons (list 'first 'second 'third))</code>  =&gt;
+    <code> ((1 . first) (2 . second) (3 . third))</code></p>
 
 <p>Stateful.</p>
 
@@ -488,7 +496,7 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 
 
 <h3 id="unreduce"><code>(unreduce</code> <em>reduced-container</em><code>)</code></h3>
-<p> Returns the value in <em>reduced-container</em>.</p>
+<p> Returns the value in <em>reduced-container</em></p>
 
 
 <h3 id="ensure-reduced"><code>(ensure-reduced</code> <em>value</em><code>)</code></h3>
@@ -497,18 +505,20 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 
 <h3 id="preserving-reduced"><code>(preserving-reduced</code> <em>reducer</em><code>)</code></h3>
 <p> Wraps <em>reducer</em> in another reducer that encapsulates any
-  returned reduced value in another reduced container. This is useful
-  in places where you re-use a reducer with
-  <em>[collection]-reduce</em>. If the reducer returns a reduced
-  value, <em>[collection]-reduce</em> unwraps it. Unless handled, this
-  leads to the reduction continuing.  </p>
+    returned reduced value in another reduced container. This is useful
+    in places where you re-use a reducer with
+    <em>[collection]-reduce</em>. If the reducer returns a reduced
+    value, <em>[collection]-reduce</em> unwraps it. Unless handled, this
+    leads to the reduction continuing.  </p>
 
 
 <h3 id="list-reduce"><code>(list-reduce</code> <em>f identity lst</em><code>)</code></h3>
 <p> The reducing function used internally by <code>list-transduce</code>. <em>f</em> is reducer
+    as returned by a transducer. <em>i dentity</em> is the identity (sometimes called "seed") of
     as returned by a transducer. <em>identity</em> is the identity (sometimes called "seed") of
     the reduction. <em>lst</em> is a list. If the <em>f</em> returns a reduced value, the reduction
     stops immediately and the unreduced value is returned.</p>
+
 
 
 <h3 id="vector-reduce"><code>(vector-reduce</code> <em> f identity vec</em><code>)</code></h3>
@@ -525,13 +535,12 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 
 <h3 id="port-reduce"><code>(port-reduce</code> <em> f identity reader port</em><code>)</code></h3>
 <p> The port version of <code>list-reducer</code>.  It reduces over <em>port</em> using
-    <em>reader</em> until <em>reader</em> returns <code>#eof-object</code>.</p>
+    <em>reader</em> until <em>reader</em> returns the EOF object.</p>
 
 
 <h3 id="generator-reduce"><code>(generator-reduce</code> <em> f identity gen</em><code>)</code></h3>
 <p> The port version of <code>list-reducer</code>.  It reduces over <em>gen</em> until it returns
-
-    <code>#eof-object</code>.</p>
+     the EOF object</p>
 
 
 <h1 id="sample-implementation">Sample implementation</h1>
@@ -552,7 +561,7 @@ r5rs/r6rs/R<sup>7</sup>RS-compatible Scheme.  The non-standard things are:</p>
 
 <h1 id="acknowledgements">Acknowledgements</h1>
 
-<p> First of all, this would not have been done without Rich Hickey, who
+<p> First of all, this would not have been done without Rich Hickey who
     introduced transducers into Clojure.  His talks were important for me
     to grasp the basics of transducers.  Then I would like to thank large
     parts of the Clojure community for also struggling with

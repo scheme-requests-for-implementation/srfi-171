@@ -41,7 +41,7 @@
                   ttake-while
                   tconcatenate
                   tappend-map
-                  tdelete-neighbor-dupes
+                  tdelete-neighbor-duplicates
                   tdelete-duplicates
                   tflatten
                   tsegment

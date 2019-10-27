@@ -300,9 +300,9 @@
 
 
 ;; removes duplicate consecutive elements
-(define tdelete-neighbor-dupes
+(define tdelete-neighbor-duplicates
   (case-lambda
-    (() (tdelete-neighbor-dupes equal?))
+    (() (tdelete-neighbor-duplicates equal?))
     ((equality-pred?) 
      (lambda (reducer)
        (let ((prev nothing))

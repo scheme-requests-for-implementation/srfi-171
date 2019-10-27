@@ -41,7 +41,7 @@
 
 (test-equal '(1 2 2 4 3 6) (list-transduce (tappend-map (lambda (x) (list x (* x 2)))) rcons '(1 2 3)))
 
-(test-equal '(1 2 1 2 3) (list-transduce (tdelete-neighbor-dupes) rcons '(1 1 1 2 2 1 2 3 3)))
+(test-equal '(1 2 1 2 3) (list-transduce (tdelete-neighbor-duplicates) rcons '(1 1 1 2 2 1 2 3 3)))
 
 (test-equal '(1 2 3 4) (list-transduce (tdelete-duplicates) rcons '(1 1 2 1 2 3 3 1 2 3 4 4)))
 
