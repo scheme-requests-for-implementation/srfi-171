@@ -287,7 +287,7 @@
 
 
 <h3 id="reverse-rcons"><code>reverse-rcons</code></h3>
-<p>same as rcons, but leaves the values in their reversed order.</p>
+<p>same as <code>rcons</code>, but leaves the values in their reversed order.</p>
 
 <p><code>(list-transduce (tmap (lambda (x) (+ x 1))) reverse-rcons (list 0 1 2 3))</code> =&gt; <code>(4 3 2
   1)</code></p>
@@ -355,7 +355,7 @@
 
 
 <h3 id="treplace-mapping"><code>(treplace</code> <em>mapping</em><code>)</code></h3>
-<p>The argument <em>mapping</em> is an association list (using equal?
+<p>The argument <em>mapping</em> is an association list (using <code>equal?</code>
     to compare keys), a hash-table, a one-argument procedure taking
     one argument and either producing that same argument or a
     replacement value, or another implementation-defined mapping
