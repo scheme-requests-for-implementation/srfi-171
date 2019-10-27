@@ -361,6 +361,10 @@
     replacement value, or another implementation-defined mapping
     object.</p>
 
+<p>Returns a transducer which checks for the presence of any value passed through it in
+    <em>mapping</em>.  If a mapping is found, the value of that mapping is
+    returned, otherwise it just returns the original value.</p>
+
 <p>Must not keep any internal state.  Modifying the mapping while it's
     in use by <code>treplace</code> is an error.</p>
 
