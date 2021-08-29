@@ -66,7 +66,7 @@
     (() 0)
     ((result) result)
     ((result input)
-     (+ 1  result))))
+     (+ 1 result))))
 
 
 ;; These two take a predicate and returns reducing functions that behave
@@ -354,7 +354,9 @@
                         (reducer result (vector->list collect 0 i)))))
                (set! i 0)
                ;; now finally, pass it downstreams
-               (reducer result)))
+               (if (reduced? result)
+                   (reducer (unreduce result))
+                   (reducer result))))
             ((result input)
              (vector-set! collect i input)
              (set! i (+ i 1))
@@ -366,8 +368,6 @@
                    (reducer result next-input)))))))))
 
 
-;; I am not sure about the correctness of this. It seems to work.
-;; we could maybe make it faster?
 (define (tpartition f)
   (lambda (reducer)
     (let* ((prev nothing)
@@ -380,7 +380,9 @@
                     result
                     (reducer result (reverse! collect)))))
            (set! collect '())
-           (reducer result)))
+           (if (reduced? result)
+               (reducer (unreduce result))
+               (reducer result))))
         ((result input)
          (let ((fout (f input)))
            (cond

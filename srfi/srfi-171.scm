@@ -26,7 +26,7 @@
                   list-transduce
                   vector-transduce
                   string-transduce
-                  bytevector-u8transduce
+                  bytevector-u8-transduce
                   port-transduce
                   generator-transduce
                   
