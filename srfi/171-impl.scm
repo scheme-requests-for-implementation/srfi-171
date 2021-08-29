@@ -286,7 +286,7 @@
 
 
 ;; Flattens everything and passes each value through the reducer
-;; (list-transduce tflatten conj (list 1 2 (list 3 4 '(5 6) 7 8))) => (1 2 3 4 5 6 7 8)
+;; (list-transduce tflatten rcons (list 1 2 (list 3 4 '(5 6) 7 8))) => (1 2 3 4 5 6 7 8)
 (define tflatten
   (lambda (reducer)
     (case-lambda
@@ -336,7 +336,6 @@
 
 ;; Partitions the input into lists of N items. If the input stops it flushes whatever
 ;; it has collected, which may be shorter than n.
-;; I am not sure about the correctness about this. It seems to work.
 (define (tsegment n)
   (if (not (and (integer? n) (positive? n)))
       (error "argument to tsegment must be a positive integer")
