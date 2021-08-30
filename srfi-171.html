@@ -49,7 +49,7 @@
 
 <p>Transducers are oblivious to what kind of process they are used in,
   and are composable without building intermediate collections.  This
-  means we can create a transducer that squares all even numbers:
+  means we can create a transducer that squares all odd numbers:
   <code>(compose (tfilter odd?) (tmap (lambda (x) (* x x))))</code>
   and reuse it with lists, vectors, or in just about any context where
   data flows in one direction.  We could use it as a processing step
@@ -383,7 +383,7 @@
 
 
 <h3 id="tdrop-while-pred"><code>(tdrop-while</code> <em>pred?</em><code>)</code></h3>
-<p>Returns a transducer that discards the the first values for which
+<p>Returns a transducer that discards the first values for which
   <em>pred?</em> returns true.</p>
 
 <p>Stateful.</p>
@@ -536,12 +536,12 @@
 
 
 <h3 id="port-reduce"><code>(port-reduce</code> <em> f identity reader port</em><code>)</code></h3>
-<p> The port version of <code>list-reducer</code>.  It reduces over <em>port</em> using
+<p> The port version of <code>list-reduce</code>.  It reduces over <em>port</em> using
     <em>reader</em> until <em>reader</em> returns the EOF object.</p>
 
 
 <h3 id="generator-reduce"><code>(generator-reduce</code> <em> f identity gen</em><code>)</code></h3>
-<p> The port version of <code>list-reducer</code>.  It reduces over <em>gen</em> until it returns
+<p> The generator version of <code>list-reduce</code>.  It reduces over <em>gen</em> until it returns
      the EOF object</p>
 
 
