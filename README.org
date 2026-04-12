@@ -1,3 +1,6 @@
+
+# SPDX-FileCopyrightText: 2026 Arthur A. Gleckler
+# SPDX-License-Identifier: MIT
 * SRFI 171: Transducers
 
 ** by Linus Björnstam
@@ -15,6 +18,5 @@ The full documentation for this SRFI can be found in the [[https://srfi.schemers
 If you'd like to participate in the discussion of this SRFI, or report issues with it, please [[https://srfi.schemers.org/srfi-171/][join the SRFI-171 mailing list]] and send your message there.
 
 Thank you.
-
 
 [[mailto:srfi-editors@srfi.schemers.org][The SRFI Editors]]

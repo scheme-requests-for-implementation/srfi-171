@@ -1,84 +1,52 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Transducers</title>
-    <link href="/admin.css" rel="stylesheet">
-    <link href="/list.css" rel="stylesheet">
-    <link href="/favicon.png" rel="icon" sizes="192x192" type="image/png">
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script type="text/x-mathjax-config">
-     MathJax.Hub.Config({
-       tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
-     });
-    </script>
-    <script crossorigin="anonymous" integrity=
-            "sha384-Ra6zh6uYMmH5ydwCqqMoykyf1T/+ZcnOQfFPhDrp2kI4OIxadnhsvvA2vv9A7xYv" src=
-            "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-            type="text/javascript"></script>
-  </head>
-
-  <body>
-    <h1>SRFI 171: Transducers</h1>
-    <p class="authors">by Linus Björnstam</p>
-    <p class="based-on"></p>
-    <p class="status">status: <em>final</em> (2019-10-26)</p>
-    <p class="keywords">keywords: <a href="https://srfi.schemers.org/?keywords=data-structure">Data Structure</a></p>
-
-    <ul class="info">
-      <li><a href="srfi-171.html">The SRFI Document</a></li>
-      <li><a href="https://srfi-email.schemers.org/srfi-171/">Discussion Archive</a></li>
-      <li><a href="https://github.com/scheme-requests-for-implementation/srfi-171">Git repo (on Github)</a></li>
-      <li>
-        <a href="mailto:srfi-171@srfi.schemers.org">srfi-171@<span class="antispam">nospam</span>srfi.schemers.org (subscribers only)</a></li>
-      <li>
-        <span class="firefox-column-workaround">
-          <form method="POST" action="https://www.simplelists.com/subscribe.php">
-            <div class="title">Subscribe to srfi-171 mailing list</div>
-            <input name="email"
-                   placeholder="email address"
-                   tabindex="1"
-                   type="email" >
-            <input name="name"
-                   placeholder="full name"
-                   tabindex="2"
-                   type="text" >
-            <p>
-              <input id="sub-digest"
-                     name="digest"
-                     tabindex="3"
-                     type="checkbox"
-                     value="digest" >
-              <label for="sub-digest">daily digest?</label></p>
-            <input class="submit"
-                   name="submit"
-                   tabindex="4"
-                   type="submit"
-                   value="Subscribe to srfi-171" >
-            <input type="hidden" name="action" value="subscribe">
-            <input type="hidden" name="list" value="srfi-171@srfi.schemers.org"></form></a></li>
-      <li>
-        <span class="firefox-column-workaround">
-          <form method="POST" action="https://www.simplelists.com/subscribe.php">
-            <p class="title">Unsubscribe from srfi-171 mailing list</p>
-            <input name="email"
-                   placeholder="email address"
-                   tabindex="5"
-                   type="email" >
-            <input class="submit"
-                   name="submit"
-                   tabindex="6"
-                   type="submit"
-                   value="Unsubscribe from srfi-171" >
-            <input name="action"
-                   type="hidden"
-                   value="unsubscribe" >
-            <input name="list"
-                   type="hidden"
-                   value="srfi-171@srfi.schemers.org"></form></a></li></ul>
-    <h2>Abstract</h2><p>A library implementing transducers &mdash; composable algorithmic
-  transformations.  Scheme has many different ways of expressing
-  transformations over different collection types, but they are all
-  unique to whatever base type they work on.  This SRFI proposes a new
-  construct, the transducer, that is oblivious to the context in which
-  it is being used.</p></body></html>
+    <head>
+      <!-- SPDX-FileCopyrightText: 2026 Arthur A. Gleckler -->
+      <!-- SPDX-License-Identifier: MIT -->
+      <title>Transducers</title>
+      <script>!function(s, k, mq, r) {
+  var p = s.getItem(k), v = [null, 'light', 'dark'],
+      S = '<svg viewBox="0 0 20 20" width="1em" height="1em">',
+      C = '<circle cx="10" cy="10" r="9" ',
+      c = [S + C + 'fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 1A9 9 0 0 0 10 19Z" fill="currentColor"/></svg>',
+           S + C + 'fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+           S + C + 'fill="black" stroke="white" stroke-width="2"/></svg>'];
+  function a(t) { r.dataset.theme = t || (mq.matches ? 'dark' : 'light') }
+  a(p);
+  mq.onchange = function() { s.getItem(k) || a() };
+  document.addEventListener('DOMContentLoaded', function() {
+    var i = Math.max(0, v.indexOf(p)),
+        b = document.body.appendChild(document.createElement('button'));
+    b.id = 'theme-toggle';
+    function u() { b.innerHTML = c[i]; b.title = (v[i] || 'system') + ' theme' }
+    b.onclick = function() { i = (i + 1) % 3; v[i] ? s.setItem(k, v[i]) : s.removeItem(k); a(v[i]); u() };
+    u()
+  })
+}(localStorage, 'theme', matchMedia('(prefers-color-scheme: dark)'), document.documentElement);
+</script>
+      <link href="/admin.css" rel="stylesheet">
+      <link href="/list.css" rel="stylesheet">
+      <link href="/favicon.png" rel="icon" sizes="192x192" type="image/png">
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+      <script crossorigin="anonymous" integrity="sha384-Ra6zh6uYMmH5ydwCqqMoykyf1T/+ZcnOQfFPhDrp2kI4OIxadnhsvvA2vv9A7xYv" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script></head>
+    <body>
+      <h1>SRFI 171: Transducers</h1>
+      <p class="authors">by Linus Björnstam</p>
+      <p class="based-on"></p>
+      <p class="status">status: <em>final</em> (2019-10-26)</p>
+      <p class="keywords">keywords: <a href="https://srfi.schemers.org/?keywords=data-structure">Data Structure</a></p>
+      <ul class="info">
+        <li><a href="srfi-171.html">The SRFI Document</a></li>
+        <li><a href="https://srfi-email.schemers.org/srfi-171/">Discussion Archive</a></li>
+        <li><a href="https://github.com/scheme-requests-for-implementation/srfi-171">Git repo (on GitHub)</a></li>
+        <li><a href="mailto:srfi-171@srfi.schemers.org">srfi-171@<span class="antispam">nospam</span>srfi.schemers.org (subscribers only)</a></li>
+        <li><span class="firefox-column-workaround">
+            <form method="POST" action="https://www.simplelists.com/subscribe.php">
+              <div class="title">Subscribe to srfi-171 mailing list</div><input name="email" placeholder="email address" tabindex="1" type="email"><input name="name" placeholder="full name" tabindex="2" type="text">
+              <p><input id="sub-digest" name="digest" tabindex="3" type="checkbox" value="digest"><label for="sub-digest">daily digest?</label></p><input class="submit" name="submit" tabindex="4" type="submit" value="Subscribe to srfi-171"><input type="hidden" name="action" value="subscribe"><input type="hidden" name="list" value="srfi-171@srfi.schemers.org"></form></span></li>
+        <li><span class="firefox-column-workaround">
+            <form method="POST" action="https://www.simplelists.com/subscribe.php">
+              <div class="title">Unsubscribe from srfi-171 mailing list</div><input name="email" placeholder="email address" tabindex="5" type="email"><input class="submit" name="submit" tabindex="6" type="submit" value="Unsubscribe from srfi-171"><input type="hidden" name="action" value="unsubscribe"><input name="list" type="hidden" value="srfi-171@srfi.schemers.org"></form></span></li></ul>
+      <h2>Abstract</h2><p>A library implementing transducers &mdash; composable algorithmic   transformations.  Scheme has many different ways of expressing   transformations over different collection types, but they are all   unique to whatever base type they work on.  This SRFI proposes a new   construct, the transducer, that is oblivious to the context in which   it is being used.</p></body></html>
